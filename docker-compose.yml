@@ -1,0 +1,40 @@
+version: '3.8'
+
+volumes:
+  pg_office:
+
+services:
+
+  office_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: office_db
+      volumes:
+        pg_office:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - office_network
+
+  office_app:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - office_db
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://office_db:5432/office_db"
+      SPRING_DATASOURCE_USERNAME: "user"
+      SPRING_DATASOURCE_PASSWORD: "pass"
+    networks:
+      - office_network
+
+networks:
+  office_network:
+    driver: bridge
+
+
+
